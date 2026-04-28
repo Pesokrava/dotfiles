@@ -73,16 +73,10 @@ if has("go") == 1 then
     settings = {
       gopls = {
         analyses = {
-          unusedparams = true,
-          ST1000 = false, -- Disable package comment requirement
+          ST1000 = false, -- Disable package comment requirement (rest handled by lazyvim extra)
         },
-        staticcheck = true, -- Keep staticcheck enabled
-        gofumpt = true,
       },
     },
-  }
-  servers.golangci_lint_ls = {
-    filetypes = { "go", "gomod" },
   }
 end
 
@@ -93,6 +87,17 @@ return {
     opts = {
       ---@type lspconfig.options
       servers = servers,
+    },
+  },
+  -- golangci-lint produces false "undefined" positives on cross-file symbols
+  -- in go.work monorepos. Disable it in-editor; run it via CLI / CI instead.
+  {
+    "mfussenegger/nvim-lint",
+    optional = true,
+    opts = {
+      linters_by_ft = {
+        go = {},
+      },
     },
   },
 }
