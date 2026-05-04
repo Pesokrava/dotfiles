@@ -98,6 +98,11 @@ vim.keymap.set("n", "<leader>fe", function()
   require("fzf-lua").files({ cmd = "fd --type f --extension " .. ext })
 end, { desc = "Find files by extension" })
 
+-- LazyVim remaps <leader>e → <leader>fe; re-pin it to NeoTree so our <leader>fe override doesn't shadow it
+vim.keymap.set("n", "<leader>e", function()
+  require("neo-tree.command").execute({ toggle = true, dir = require("lazyvim.util").root() })
+end, { desc = "Explorer NeoTree (root dir)" })
+
 vim.keymap.set("n", "<leader>fW", function()
   local dir = vim.fn.input("Dir: ", vim.fn.getcwd(), "dir")
   local ext = vim.fn.input("Extension (empty=all): ")
