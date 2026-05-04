@@ -1,0 +1,105 @@
+---
+- name: Linux dev environment setup
+  hosts: all
+  gather_facts: false
+
+  vars:
+    username: "{{ ansible_user }}"
+    home: "/home/{{ username }}"
+    brew_prefix: /home/linuxbrew/.linuxbrew
+
+  tasks:
+    - name: Install system packages
+      become: true
+      ansible.builtin.apt:
+        name:
+          - git
+          - curl
+          - wget
+          - unzip
+          - build-essential
+          - pkg-config
+          - libssl-dev
+          - python3-dev
+          - jq
+          - stow
+          - zsh
+          - linux-tools-generic # bpftool
+          - iproute2
+          - net-tools
+        state: present
+
+    - name: Set zsh as default shell
+      become: true
+      ansible.builtin.user:
+        name: "{{ username }}"
+        shell: /bin/zsh
+
+    - name: Install oh-my-zsh
+      ansible.builtin.shell:
+        cmd: RUNZSH=no CHSH=no sh -c "$(curl -fsSL
+          https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+        creates: "{{ home }}/.oh-my-zsh"
+
+    - name: Install Homebrew
+      ansible.builtin.shell:
+        cmd: NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL
+          https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+        creates: "{{ brew_prefix }}/bin/brew"
+
+    - name: Add brew shellenv to .zshrc
+      ansible.builtin.lineinfile:
+        path: "{{ home }}/.zshrc"
+        line: 'eval "$({{ brew_prefix }}/bin/brew shellenv)"'
+        create: true
+
+    - name: Install CLI tools via brew
+      community.general.homebrew:
+        name: "{{ item }}"
+        state: present
+        path: "{{ brew_prefix }}/bin"
+      loop:
+        - go
+        - node
+        - fzf
+        - ripgrep
+        - fd
+        - tmux
+        - lazygit
+        - neovim
+        - opencode
+        - uv
+
+    - name: Install Rust via rustup
+      ansible.builtin.shell:
+        cmd: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+          --no-modify-path
+        creates: "{{ home }}/.cargo/bin/rustup"
+
+    - name: Install nightly toolchain + bpf-linker
+      ansible.builtin.shell:
+        cmd: |
+          source {{ home }}/.cargo/env
+          rustup toolchain install nightly --component rust-src
+          cargo +nightly install bpf-linker
+        executable: /bin/bash
+        creates: "{{ home }}/.cargo/bin/bpf-linker"
+
+    - name: Add cargo to zshrc
+      ansible.builtin.lineinfile:
+        path: "{{ home }}/.zshrc"
+        line: 'source "$HOME/.cargo/env"'
+        create: true
+
+    - name: Clone dotfiles
+      ansible.builtin.git:
+        repo: https://github.com/Pesokrava/dotfiles
+        dest: "{{ home }}/.dotfiles"
+        version: main
+      ignore_errors: true
+
+    - name: Apply dotfiles
+      ansible.builtin.shell:
+        cmd: bash install.sh
+        chdir: "{{ home }}/.dotfiles"
+      ignore_errors: true
