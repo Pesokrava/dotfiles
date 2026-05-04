@@ -88,6 +88,23 @@ vim.api.nvim_set_keymap(
   { desc = "Copy relative file path from CWD", noremap = true, silent = true }
 )
 
+vim.keymap.set("n", "<leader>fw", function()
+  require("fzf-lua").files({ cwd = vim.fn.input("Dir: ", vim.fn.getcwd(), "dir") })
+end, { desc = "Find files in dir" })
+
+vim.keymap.set("n", "<leader>fe", function()
+  local ext = vim.fn.input("Extension: ")
+  if ext == "" then return end
+  require("fzf-lua").files({ cmd = "fd --type f --extension " .. ext })
+end, { desc = "Find files by extension" })
+
+vim.keymap.set("n", "<leader>fW", function()
+  local dir = vim.fn.input("Dir: ", vim.fn.getcwd(), "dir")
+  local ext = vim.fn.input("Extension (empty=all): ")
+  local cmd = ext ~= "" and ("fd --type f --extension " .. ext) or nil
+  require("fzf-lua").files({ cwd = dir, cmd = cmd })
+end, { desc = "Find files (dir + extension)" })
+
 
 -- This function toggles the conceal level between 0 and 2
 function toggle_conceal()
