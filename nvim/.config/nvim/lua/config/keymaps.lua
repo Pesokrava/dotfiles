@@ -110,6 +110,22 @@ vim.keymap.set("n", "<leader>fW", function()
   require("fzf-lua").files({ cwd = dir, cmd = cmd })
 end, { desc = "Find files (dir + extension)" })
 
+vim.keymap.set("n", "<leader>ge", function()
+  local ext = vim.fn.input("Extension: ")
+  if ext == "" then return end
+  require("fzf-lua").live_grep({ rg_opts = "--glob='*." .. ext .. "'" })
+end, { desc = "Live grep by extension" })
+
+vim.keymap.set("n", "<leader>gw", function()
+  require("fzf-lua").live_grep({ cwd = vim.fn.input("Dir: ", vim.fn.getcwd(), "dir") })
+end, { desc = "Live grep in dir" })
+
+vim.keymap.set("n", "<leader>gW", function()
+  local dir = vim.fn.input("Dir: ", vim.fn.getcwd(), "dir")
+  local ext = vim.fn.input("Extension (empty=all): ")
+  local rg_opts = ext ~= "" and ("--glob='*." .. ext .. "'") or nil
+  require("fzf-lua").live_grep({ cwd = dir, rg_opts = rg_opts })
+end, { desc = "Live grep (dir + extension)" })
 
 -- This function toggles the conceal level between 0 and 2
 function toggle_conceal()
