@@ -8,38 +8,6 @@
 --     vim.b.autoformat = false
 --   end,
 -- })
-vim.api.nvim_create_autocmd("FileType", {
-  pattern = "javascript",
-  command = "setlocal shiftwidth=4 tabstop=4",
-})
-
-vim.api.nvim_create_autocmd("FileType", {
-  pattern = "typescript",
-  command = "setlocal shiftwidth=4 tabstop=4",
-})
-
-vim.api.nvim_create_autocmd("FileType", {
-  pattern = "typescriptreact",
-  command = "setlocal shiftwidth=4 tabstop=4",
-})
-
-vim.api.nvim_create_autocmd("FileType", {
-  pattern = "scss",
-  callback = function()
-    vim.opt_local.shiftwidth = 4
-    vim.opt_local.tabstop = 4
-    vim.opt_local.expandtab = true
-  end,
-})
-
-vim.api.nvim_create_autocmd("FileType", {
-  pattern = "html",
-  callback = function()
-    vim.opt_local.shiftwidth = 4
-    vim.opt_local.tabstop = 4
-    vim.opt_local.expandtab = true
-  end,
-})
 
 vim.api.nvim_create_autocmd({ "BufEnter", "CursorHold", "CursorHoldI", "FocusGained" }, {
   command = "if mode() != 'c' | checktime | endif",

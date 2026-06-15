@@ -73,7 +73,8 @@ fi
 # ---------------------------------------------------------------------------
 echo "Stowing packages: ${PACKAGES[*]}"
 cd "$DOTFILES_DIR"
-stow "${PACKAGES[@]}"
+
+stow -t "$HOME" "${PACKAGES[@]}"
 
 echo ""
 echo "Done! Symlinks created:"

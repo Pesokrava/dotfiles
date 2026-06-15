@@ -87,6 +87,13 @@ return {
     opts = {
       ---@type lspconfig.options
       servers = servers,
+      setup = {
+        -- Disable LazyVim's obsolete gopls semanticTokensProvider workaround:
+        -- modern gopls advertises semantic tokens itself, and the LazyVim hack
+        -- both crashes on missing client.textDocument capabilities and produces
+        -- a legend that mismatches gopls's actual token indices.
+        gopls = function(_, _) end,
+      },
     },
   },
   -- golangci-lint produces false "undefined" positives on cross-file symbols

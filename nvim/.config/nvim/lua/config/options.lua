@@ -5,6 +5,10 @@ vim.opt.nu = true
 vim.g.autoformat = false
 vim.o.autoread = true
 
+-- LazyVim defaults to 2-space indentation; use 4 everywhere instead.
+vim.opt.shiftwidth = 4
+vim.opt.tabstop = 4
+
 -- ---------------------------------------------------------------------------
 -- Clipboard
 -- ---------------------------------------------------------------------------
