@@ -139,3 +139,23 @@ EOF
   echo "Appended 'export EDITOR=\"nvim\"' to ~/.zshrc"
 fi
 
+# ---------------------------------------------------------------------------
+# Bash customizations (append; idempotent). For shells whose login shell is
+# bash — e.g. the Coder devcontainer default — mirror the key zsh tweaks.
+# ---------------------------------------------------------------------------
+BASHRC="$HOME/.bashrc"
+if grep -qF '# dotfiles: bash customizations' "$BASHRC" 2>/dev/null; then
+  echo "bash customizations already present in ~/.bashrc, skipping."
+else
+  cat >> "$BASHRC" << 'EOF'
+
+# dotfiles: bash customizations
+export LANG=C.UTF-8
+set -o vi
+alias vi="nvim"
+# Prompt: show just the current path.
+PS1='\[\e[1;36m\]\w\[\e[0m\] \$ '
+EOF
+  echo "Appended bash customizations to ~/.bashrc"
+fi
+
