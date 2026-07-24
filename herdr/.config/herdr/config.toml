@@ -1,0 +1,98 @@
+# herdr config — ported from tmux/.config/tmux/tmux.conf
+# herdr is a tmux-like agent multiplexer; only the tmux settings with a herdr
+# equivalent are carried over. See notes at the bottom for what doesn't port.
+
+# already chosen; skip the first-run setup
+onboarding = false
+
+[theme]
+# tmux ran catppuccin mocha; herdr ships catppuccin (mocha) as one theme
+name = "catppuccin"
+
+[terminal]
+# tmux opened splits with `-c #{pane_current_path}`; "follow" = same behavior
+new_cwd = "follow"
+
+[keys]
+# tmux: set -g prefix C-s
+prefix = "ctrl+s"
+
+# tmux vi mode-keys + copy-mode v/y is herdr's built-in copy mode (prefix+[,
+# then h/j/k/l/w/b/e, v to select, y to copy) — nothing to configure.
+
+# Seamless C-h/j/k/l nav (no prefix), the true tmux-navigate port: the smart
+# herdr-splits actions bound at the bottom of this file check if the focused
+# pane runs nvim and forward the chord (nvim moves its split, delegates back at
+# edges); otherwise they move herdr pane focus. Requires the herdr-side plugin:
+#   herdr plugin install lmilojevicc/herdr-splits.nvim --yes
+# reload_config stays at prefix+shift+r (tmux used `prefix r`).
+
+# tmux-compliant split keys: % = side-by-side (vertical divider), " = top/bottom
+split_vertical = "prefix+%"
+split_horizontal = 'prefix+"'
+
+# Free prefix+h/j/k/l (default focus_pane) — pane nav lives on the direct
+# ctrl+h/j/k/l plugin actions below; the prefixed keys go to the agent panel.
+focus_pane_left = ""
+focus_pane_down = ""
+focus_pane_up = ""
+focus_pane_right = ""
+
+# Agent panel navigation on prefix+h/j/k/l (h/k = previous, j/l = next).
+previous_agent = ["prefix+h", "prefix+k"]
+next_agent = ["prefix+j", "prefix+l"]
+
+# Workspace navigation (herdr can't do prefix+space+key sequences, so single
+# chords): prev/next on prefix+shift+p / prefix+shift+n (shift+letter = capital,
+# unambiguous). Jump-by-number on PLAIN prefix+1..9, tmux-window style — Shift
+# +number is unusable on a Mac (Shift+1 = "!"). This takes plain numbers off
+# tabs, so switch_tab is disabled below; tabs still cycle with prefix+p / n.
+previous_workspace = "prefix+shift+p"
+next_workspace = "prefix+shift+n"
+switch_workspace = "prefix+1..9"
+switch_tab = ""
+
+# Relocated to free prefix+shift+p / prefix+shift+n for the workspace keys above:
+rename_pane = "prefix+shift+e"      # was prefix+shift+p
+new_workspace = "prefix+shift+c"    # was prefix+shift+n (c = create)
+
+# tmux prefix+& kills the window; map it to close tab (herdr default: prefix+shift+x).
+close_tab = "prefix+&"
+
+[ui]
+# echo the tmux catppuccin pink/aubergine accent (#f5c2e7 = mocha pink)
+accent = "#f5c2e7"
+
+# Smart seamless nav, ported from tmux-navigate (see comment in [keys]).
+# The nav-* actions are vim-aware: forward to nvim when it's focused, else
+# move herdr pane focus. Resize actions exist too (alt+h/j/k/l) but are left
+# unbound — nvim uses winresizer, herdr uses prefix+r.
+agent_panel_sort = "spaces"
+[[keys.command]]
+key = "ctrl+h"
+type = "plugin_action"
+command = "herdr-splits.nav-left"
+
+[[keys.command]]
+key = "ctrl+j"
+type = "plugin_action"
+command = "herdr-splits.nav-down"
+
+[[keys.command]]
+key = "ctrl+k"
+type = "plugin_action"
+command = "herdr-splits.nav-up"
+
+[[keys.command]]
+key = "ctrl+l"
+type = "plugin_action"
+command = "herdr-splits.nav-right"
+
+# ponytail: the following tmux features have NO herdr equivalent — left out on purpose:
+#   - status bar modules (cpu / memory / primary-ip / battery / date / coder
+#     workspace): herdr has no configurable status bar; its sidebar shows agent
+#     state instead.
+#   - per-pane dim/aubergine bg (window-active-style): herdr shows real terminal
+#     panes; pane bg comes from the shell, not the multiplexer.
+#   - plugins (sessionx, which-key, resurrect): covered natively by
+#     prefix+w (workspace picker), prefix+? (help), and built-in persistence.

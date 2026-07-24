@@ -7,7 +7,7 @@ DOTFILES_DIR="$(cd "$(dirname "$0")" && pwd)"
 # configured manually per machine (it contains oh-my-zsh setup, machine-specific
 # paths, and secrets loaded via ~/.env.llm). See zsh/.zshrc.example for a
 # reference template.
-PACKAGES=(nvim kitty tmux git)
+PACKAGES=(nvim kitty tmux git herdr)
 
 # ---------------------------------------------------------------------------
 # 1. Install GNU Stow if missing
@@ -39,6 +39,7 @@ for pkg in "${PACKAGES[@]}"; do
     nvim)  target="$HOME/.config/nvim"  ;;
     kitty) target="$HOME/.config/kitty" ;;
     tmux)  target="$HOME/.config/tmux"  ;;
+    herdr) target="$HOME/.config/herdr/config.toml" ;;
     git)   target="$HOME/.gitconfig"    ;;
     *)     continue ;;
   esac
@@ -83,6 +84,7 @@ for pkg in "${PACKAGES[@]}"; do
     nvim)  echo "  ~/.config/nvim  -> $DOTFILES_DIR/nvim/.config/nvim"  ;;
     kitty) echo "  ~/.config/kitty -> $DOTFILES_DIR/kitty/.config/kitty" ;;
     tmux)  echo "  ~/.config/tmux  -> $DOTFILES_DIR/tmux/.config/tmux"  ;;
+    herdr) echo "  ~/.config/herdr/config.toml -> $DOTFILES_DIR/herdr/.config/herdr/config.toml" ;;
     git)   echo "  ~/.gitconfig    -> $DOTFILES_DIR/git/.gitconfig"     ;;
   esac
 done
