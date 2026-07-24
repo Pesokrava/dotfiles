@@ -7,14 +7,15 @@ DOTFILES_DIR="$(cd "$(dirname "$0")" && pwd)"
 # configured manually per machine (it contains oh-my-zsh setup, machine-specific
 # paths, and secrets loaded via ~/.env.llm). See zsh/.zshrc.example for a
 # reference template.
-# herdr is optional — stow manually when needed: stow -t "$HOME" herdr
 PACKAGES=(nvim kitty tmux git)
 
-# Stowed with --no-folding so ~/.claude and ~/.config/opencode stay REAL dirs
-# and only our leaf files get symlinked. Folding would turn the whole dir into
-# one symlink, dragging live state (sessions, credentials, node_modules) into
-# the repo. ponytail: --no-folding, revisit only if a tool needs a folded dir.
-NOFOLD_PACKAGES=(claude opencode)
+# Stowed with --no-folding so ~/.claude, ~/.config/opencode and ~/.config/herdr
+# stay REAL dirs and only our leaf files get symlinked. Folding would turn the
+# whole dir into one symlink, dragging live state (sessions, credentials,
+# node_modules, herdr sockets/logs/session.json/plugins) into the repo.
+# herdr's plugins are NOT stowed — install per-env: herdr plugin install <repo>.
+# ponytail: --no-folding, revisit only if a tool needs a folded dir.
+NOFOLD_PACKAGES=(claude opencode herdr)
 
 # ---------------------------------------------------------------------------
 # 1. Install GNU Stow if missing
@@ -102,10 +103,11 @@ for pkg in "${PACKAGES[@]}"; do
 done
 echo "  ~/.claude/{settings.json,commands,hooks,skills/linus-review,skills/review-fleet} -> $DOTFILES_DIR/claude/.claude/*"
 echo "  ~/.config/opencode/{opencode.json,tui.json,command,skill,plugins} -> $DOTFILES_DIR/opencode/.config/opencode/*"
+echo "  ~/.config/herdr/config.toml -> $DOTFILES_DIR/herdr/.config/herdr/config.toml"
 echo ""
 echo "Note: ~/.zshrc is NOT managed by stow. Configure it manually per machine."
 echo "      See $DOTFILES_DIR/zsh/.zshrc.example for a reference template."
-echo "Note: herdr is optional. Stow manually: stow -t \"\$HOME\" herdr"
+echo "Note: herdr config is stowed, but plugins are per-env: herdr plugin install <repo>."
 
 # ---------------------------------------------------------------------------
 # 4. Append vi mode keybinding to ~/.zshrc if not already present
