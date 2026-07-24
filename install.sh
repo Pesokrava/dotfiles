@@ -7,7 +7,8 @@ DOTFILES_DIR="$(cd "$(dirname "$0")" && pwd)"
 # configured manually per machine (it contains oh-my-zsh setup, machine-specific
 # paths, and secrets loaded via ~/.env.llm). See zsh/.zshrc.example for a
 # reference template.
-PACKAGES=(nvim kitty tmux git herdr)
+# herdr is optional — stow manually when needed: stow -t "$HOME" herdr
+PACKAGES=(nvim kitty tmux git)
 
 # Stowed with --no-folding so ~/.claude and ~/.config/opencode stay REAL dirs
 # and only our leaf files get symlinked. Folding would turn the whole dir into
@@ -61,7 +62,6 @@ for pkg in "${PACKAGES[@]}"; do
     nvim)  backup_if_real "$HOME/.config/nvim"  ;;
     kitty) backup_if_real "$HOME/.config/kitty" ;;
     tmux)  backup_if_real "$HOME/.config/tmux"  ;;
-    herdr) backup_if_real "$HOME/.config/herdr" ;; # whole dir, not just config.toml
     git)   backup_if_real "$HOME/.gitconfig"    ;;
   esac
 done
@@ -97,7 +97,6 @@ for pkg in "${PACKAGES[@]}"; do
     nvim)  echo "  ~/.config/nvim  -> $DOTFILES_DIR/nvim/.config/nvim"  ;;
     kitty) echo "  ~/.config/kitty -> $DOTFILES_DIR/kitty/.config/kitty" ;;
     tmux)  echo "  ~/.config/tmux  -> $DOTFILES_DIR/tmux/.config/tmux"  ;;
-    herdr) echo "  ~/.config/herdr/config.toml -> $DOTFILES_DIR/herdr/.config/herdr/config.toml" ;;
     git)   echo "  ~/.gitconfig    -> $DOTFILES_DIR/git/.gitconfig"     ;;
   esac
 done
@@ -106,6 +105,7 @@ echo "  ~/.config/opencode/{opencode.json,tui.json,command,skill,plugins} -> $DO
 echo ""
 echo "Note: ~/.zshrc is NOT managed by stow. Configure it manually per machine."
 echo "      See $DOTFILES_DIR/zsh/.zshrc.example for a reference template."
+echo "Note: herdr is optional. Stow manually: stow -t \"\$HOME\" herdr"
 
 # ---------------------------------------------------------------------------
 # 4. Append vi mode keybinding to ~/.zshrc if not already present
