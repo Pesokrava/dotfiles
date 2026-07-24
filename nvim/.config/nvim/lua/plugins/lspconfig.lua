@@ -72,6 +72,10 @@ if has("go") == 1 then
   servers.gopls = {
     settings = {
       gopls = {
+        -- Load integration-tagged files (//go:build integration) so gopls has
+        -- package metadata for them — otherwise InlayHint/diagnostics/completion
+        -- fail with "no package metadata for file".
+        buildFlags = { "-tags=integration" },
         analyses = {
           ST1000 = false, -- Disable package comment requirement (rest handled by lazyvim extra)
         },
@@ -96,14 +100,15 @@ return {
       },
     },
   },
-  -- golangci-lint produces false "undefined" positives on cross-file symbols
-  -- in go.work monorepos. Disable it in-editor; run it via CLI / CI instead.
+  -- Lint Go in-editor with golangci-lint. nvim-lint's builtin lints the file's
+  -- package dir (not the single file), so cross-file symbols resolve — no more
+  -- false "undefined" positives. It also auto-picks the v2 output flags.
   {
     "mfussenegger/nvim-lint",
     optional = true,
     opts = {
       linters_by_ft = {
-        go = {},
+        go = { "golangcilint" },
       },
     },
   },
