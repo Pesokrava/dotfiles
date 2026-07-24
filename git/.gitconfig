@@ -3,3 +3,5 @@
 	name = Martin Stubian
 [core]
 	excludesFile = ~/.config/git/ignore
+[pull]
+	rebase = false
