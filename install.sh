@@ -9,6 +9,12 @@ DOTFILES_DIR="$(cd "$(dirname "$0")" && pwd)"
 # reference template.
 PACKAGES=(nvim kitty tmux git herdr)
 
+# Stowed with --no-folding so ~/.claude and ~/.config/opencode stay REAL dirs
+# and only our leaf files get symlinked. Folding would turn the whole dir into
+# one symlink, dragging live state (sessions, credentials, node_modules) into
+# the repo. ponytail: --no-folding, revisit only if a tool needs a folded dir.
+NOFOLD_PACKAGES=(claude opencode)
+
 # ---------------------------------------------------------------------------
 # 1. Install GNU Stow if missing
 # ---------------------------------------------------------------------------
@@ -72,10 +78,11 @@ fi
 # ---------------------------------------------------------------------------
 # 3. Stow all packages
 # ---------------------------------------------------------------------------
-echo "Stowing packages: ${PACKAGES[*]}"
+echo "Stowing packages: ${PACKAGES[*]} ${NOFOLD_PACKAGES[*]}"
 cd "$DOTFILES_DIR"
 
 stow -t "$HOME" "${PACKAGES[@]}"
+stow --no-folding -t "$HOME" "${NOFOLD_PACKAGES[@]}"
 
 echo ""
 echo "Done! Symlinks created:"
@@ -88,6 +95,8 @@ for pkg in "${PACKAGES[@]}"; do
     git)   echo "  ~/.gitconfig    -> $DOTFILES_DIR/git/.gitconfig"     ;;
   esac
 done
+echo "  ~/.claude/{settings.json,commands,hooks,skills/linus-review,skills/review-fleet} -> $DOTFILES_DIR/claude/.claude/*"
+echo "  ~/.config/opencode/{opencode.json,tui.json,command,skill,plugins} -> $DOTFILES_DIR/opencode/.config/opencode/*"
 echo ""
 echo "Note: ~/.zshrc is NOT managed by stow. Configure it manually per machine."
 echo "      See $DOTFILES_DIR/zsh/.zshrc.example for a reference template."

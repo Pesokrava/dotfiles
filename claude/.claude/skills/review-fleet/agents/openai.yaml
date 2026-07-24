@@ -1,0 +1,4 @@
+interface:
+  display_name: "Review Fleet"
+  short_description: "Parallel multi-reviewer code review"
+  default_prompt: "Use $review-fleet to run a parallel multi-reviewer review of the current changes."
