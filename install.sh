@@ -37,39 +37,37 @@ fi
 # ---------------------------------------------------------------------------
 # 2. Back up any existing configs that would conflict with stow
 # ---------------------------------------------------------------------------
+# Whole dirs (not leaf files): stow errors "existing target is not owned by
+# stow: .config/herdr" if the dir exists as a real tree — backing up only a
+# leaf leaves the parent and stow still fails (Coder/dev images often precreate
+# these).
 BACKUP_DIR="$HOME/.dotfiles-backup-$(date +%Y%m%d-%H%M%S)"
 backup_needed=false
 
+backup_if_real() {
+  local target="$1"
+  # Already a symlink → prior stow (or manual); leave it for restow/adopt.
+  if [ -L "$target" ] || [ ! -e "$target" ]; then
+    return 0
+  fi
+  backup_needed=true
+  mkdir -p "$BACKUP_DIR"
+  echo "Backing up $target -> $BACKUP_DIR/"
+  mv "$target" "$BACKUP_DIR/"
+}
+
 for pkg in "${PACKAGES[@]}"; do
   case "$pkg" in
-    nvim)  target="$HOME/.config/nvim"  ;;
-    kitty) target="$HOME/.config/kitty" ;;
-    tmux)  target="$HOME/.config/tmux"  ;;
-    herdr) target="$HOME/.config/herdr/config.toml" ;;
-    git)   target="$HOME/.gitconfig"    ;;
-    *)     continue ;;
+    nvim)  backup_if_real "$HOME/.config/nvim"  ;;
+    kitty) backup_if_real "$HOME/.config/kitty" ;;
+    tmux)  backup_if_real "$HOME/.config/tmux"  ;;
+    herdr) backup_if_real "$HOME/.config/herdr" ;; # whole dir, not just config.toml
+    git)   backup_if_real "$HOME/.gitconfig"    ;;
   esac
-
-  # Skip if it's already a symlink (probably from a previous stow run)
-  if [ -L "$target" ]; then
-    continue
-  fi
-
-  if [ -e "$target" ]; then
-    backup_needed=true
-    mkdir -p "$BACKUP_DIR"
-    echo "Backing up $target -> $BACKUP_DIR/"
-    mv "$target" "$BACKUP_DIR/"
-  fi
 done
 
 # Also back up ~/.tmux.conf if it exists (we now use ~/.config/tmux/tmux.conf)
-if [ -e "$HOME/.tmux.conf" ] && [ ! -L "$HOME/.tmux.conf" ]; then
-  backup_needed=true
-  mkdir -p "$BACKUP_DIR"
-  echo "Backing up ~/.tmux.conf -> $BACKUP_DIR/"
-  mv "$HOME/.tmux.conf" "$BACKUP_DIR/"
-fi
+backup_if_real "$HOME/.tmux.conf"
 
 if [ "$backup_needed" = true ]; then
   echo "Existing configs backed up to: $BACKUP_DIR"
@@ -81,9 +79,17 @@ fi
 echo "Stowing packages: ${PACKAGES[*]} ${NOFOLD_PACKAGES[*]}"
 cd "$DOTFILES_DIR"
 
-stow -t "$HOME" "${PACKAGES[@]}"
-stow --no-folding -t "$HOME" "${NOFOLD_PACKAGES[@]}"
-
+# --adopt: if anything still blocks (race / unexpected path), pull it into the
+# package tree and replace with a symlink. Dirty git clone is fine on ephemeral
+# workspaces; local machines rarely hit this after the backup pass.
+if ! stow -t "$HOME" "${PACKAGES[@]}"; then
+  echo "stow conflict — retrying with --adopt"
+  stow --adopt -t "$HOME" "${PACKAGES[@]}"
+fi
+if ! stow --no-folding -t "$HOME" "${NOFOLD_PACKAGES[@]}"; then
+  echo "stow --no-folding conflict — retrying with --adopt"
+  stow --adopt --no-folding -t "$HOME" "${NOFOLD_PACKAGES[@]}"
+fi
 echo ""
 echo "Done! Symlinks created:"
 for pkg in "${PACKAGES[@]}"; do
