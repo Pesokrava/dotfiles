@@ -101,7 +101,7 @@ for pkg in "${PACKAGES[@]}"; do
     git)   echo "  ~/.gitconfig    -> $DOTFILES_DIR/git/.gitconfig"     ;;
   esac
 done
-echo "  ~/.claude/{settings.json,commands,hooks,skills/linus-review,skills/review-fleet} -> $DOTFILES_DIR/claude/.claude/*"
+echo "  ~/.claude/{settings.json,commands,hooks,skills/*} -> $DOTFILES_DIR/claude/.claude/*"
 echo "  ~/.config/opencode/{opencode.json,tui.json,command,skill,plugins} -> $DOTFILES_DIR/opencode/.config/opencode/*"
 echo "  ~/.config/herdr/config.toml -> $DOTFILES_DIR/herdr/.config/herdr/config.toml"
 echo ""
