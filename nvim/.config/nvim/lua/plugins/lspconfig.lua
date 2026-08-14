@@ -111,5 +111,23 @@ return {
         go = { "golangcilint" },
       },
     },
+    -- golangci-lint resolves the Go module from its own process cwd, and
+    -- nvim-lint runs it in nvim's cwd (lint.lua: `linter.cwd or getcwd()`).
+    -- In a multi-module repo without go.work, opening nvim above the module
+    -- puts that cwd outside every go.mod, so typecheck reports every import
+    -- as "no required module provides package ...". Pin each run to the
+    -- module that owns the buffer.
+    init = function()
+      vim.api.nvim_create_autocmd({ "BufReadPost", "BufWritePost", "InsertLeave" }, {
+        group = vim.api.nvim_create_augroup("golangcilint_module_cwd", { clear = true }),
+        pattern = "*.go",
+        callback = function(ev)
+          local dir = vim.fs.root(ev.buf, "go.mod")
+          if dir then
+            require("lint").linters.golangcilint.cwd = dir
+          end
+        end,
+      })
+    end,
   },
 }
