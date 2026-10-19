@@ -88,6 +88,13 @@ vim.api.nvim_set_keymap(
   { desc = "Copy relative file path from CWD", noremap = true, silent = true }
 )
 
+vim.api.nvim_set_keymap(
+  "n",
+  "<leader>fA",
+  ':lua require("config.utils").copy_agent_line_ref()<CR>',
+  { desc = "Copy @file line ref for agent", noremap = true, silent = true }
+)
+
 vim.keymap.set("n", "<leader>fw", function()
   require("fzf-lua").files({ cwd = vim.fn.input("Dir: ", vim.fn.getcwd(), "dir") })
 end, { desc = "Find files in dir" })

@@ -53,4 +53,11 @@ function utils.copy_relative_path_from_cwd()
   print("Copied: " .. relative_path)
 end
 
+function utils.copy_agent_line_ref()
+  local relative_path = vim.fn.fnamemodify(vim.fn.expand("%:p"), ":.")
+  local ref = "@" .. relative_path .. " line " .. vim.fn.line(".")
+  vim.fn.setreg("+", ref)
+  print("Copied: " .. ref)
+end
+
 return utils
