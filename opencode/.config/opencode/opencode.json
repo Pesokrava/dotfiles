@@ -33,5 +33,9 @@
     "oh-my-openagent",
     "superpowers@git+https://github.com/obra/superpowers.git",
     "@dietrichgebert/ponytail"
+  ],
+  "skills": [
+    "~/.claude/plugins/marketplaces/bind-dev-env/skills/the-factory/skills",
+    "~/bindnetworks/dev-env/skills/the-factory/skills"
   ]
 }
