@@ -3,6 +3,7 @@
 -- Add any additional options here
 vim.opt.nu = true
 vim.g.autoformat = false
+vim.g.snacks_animate = false
 vim.o.autoread = true
 
 -- LazyVim defaults to 2-space indentation; use 4 everywhere instead.

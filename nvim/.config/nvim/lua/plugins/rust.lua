@@ -13,12 +13,6 @@ return {
             vim.cmd.RustLsp("codeAction")
           end, { desc = "Rust Code Action", buffer = bufnr })
 
-          -- <leader>dR opens the rustaceanvim debuggables picker
-          -- (avoids conflict with existing <leader>dr = clear all breakpoints)
-          vim.keymap.set("n", "<leader>dR", function()
-            vim.cmd.RustLsp("debuggables")
-          end, { desc = "Rust Debuggables", buffer = bufnr })
-
           -- <leader>dE opens the rustaceanvim runnables picker
           vim.keymap.set("n", "<leader>dE", function()
             vim.cmd.RustLsp("runnables")

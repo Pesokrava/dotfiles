@@ -7,14 +7,8 @@ return {
   dependencies = {
     "nvim-lua/plenary.nvim",
     "stevearc/dressing.nvim", -- optional for vim.ui.select
-    "mfussenegger/nvim-dap",
   },
   config = function()
-    require("flutter-tools").setup({
-      debugger = {
-        enabled = true,
-        run_via_dap = true,
-      },
-    })
+    require("flutter-tools").setup({})
   end,
 }

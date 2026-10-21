@@ -16,6 +16,7 @@ require("lazy").setup({
     { import = "lazyvim.plugins.extras.lang.json" },
     -- { import = "lazyvim.plugins.extras.ui.mini-animate" },
     { import = "lazyvim.plugins.extras.linting.eslint" },
+    { "mfussenegger/nvim-dap", enabled = false },
     -- import/override with your plugins
     { import = "plugins" },
   },
