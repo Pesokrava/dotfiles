@@ -59,6 +59,19 @@ local servers = {
   },
 }
 
+if has("arduino-cli") == 1 then
+  servers.arduino_language_server = {
+    cmd = {
+      "arduino-language-server",
+      "-cli-config",
+      vim.fn.expand("~/Library/Arduino15/arduino-cli.yaml"),
+      -- ponytail: hardcoded Uno; per-sketch boards go in sketch.yaml default_fqbn
+      "-fqbn",
+      "arduino:avr:uno",
+    },
+  }
+end
+
 if has("python3") == 1 then
   servers.pyright = {
     settings = {
@@ -84,6 +97,16 @@ if has("go") == 1 then
   }
 end
 
+-- Resolved once per session, through the shim, so a toolchain bump is picked up
+-- on restart instead of being hardcoded.
+local goroot_cache
+local function goroot_bin()
+  if not goroot_cache then
+    goroot_cache = vim.trim(vim.fn.system({ "go", "env", "GOROOT" })) .. "/bin"
+  end
+  return goroot_cache
+end
+
 return {
   {
     "neovim/nvim-lspconfig",
@@ -107,8 +130,36 @@ return {
     "mfussenegger/nvim-lint",
     optional = true,
     opts = {
+      -- golangci-lint reads the file from disk, not the buffer. Linting on
+      -- InsertLeave runs ~900ms before auto-save's deferred write lands, so it
+      -- re-reports the pre-edit file and looks like a stale warning. Writes are
+      -- the only point the on-disk content changed, so they are the only trigger.
+      events = { "BufWritePost", "BufReadPost" },
       linters_by_ft = {
         go = { "golangcilint" },
+      },
+      linters = {
+        -- nvim-lint spawns linters in nvim's cwd. In a multi-module monorepo
+        -- with no go.work that cwd has no go.mod, so golangci-lint resolved no
+        -- module and reported every import as a `typecheck` error. Run it from
+        -- the buffer's own module, and point it at the buffer's package dir
+        -- (the builtin's own dir-vs-file choice is decided once at load time,
+        -- in the wrong cwd).
+        golangcilint = function()
+          local linter = vim.deepcopy(require("lint.linters.golangcilint"))
+          local dir = vim.fn.expand("%:p:h")
+          linter.cwd = vim.fs.root(dir, "go.mod") or dir
+          -- golangci-lint shells out to `go env`/`go list` several times per
+          -- run, and proto's `go` shim costs ~1s per invocation: 6.6s vs 0.35s
+          -- on control/services/populator. Put the real toolchain bin ahead of
+          -- the shims. nvim-lint replaces the whole environment when `env` is
+          -- set, so HOME has to be carried over — GOCACHE/GOPATH derive from it.
+          linter.env = { PATH = goroot_bin() .. ":" .. vim.env.PATH, HOME = vim.env.HOME }
+          linter.args[#linter.args] = function()
+            return dir
+          end
+          return linter
+        end,
       },
     },
     -- golangci-lint resolves the Go module from its own process cwd, and

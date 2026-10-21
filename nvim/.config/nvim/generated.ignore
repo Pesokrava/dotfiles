@@ -1,0 +1,19 @@
+# Path/name patterns for generated files, hidden from fzf-lua by <leader>uG.
+# gitignore syntax; consumed via fd/rg --ignore-file.
+*_gen.go
+*.gen.go
+*_generated.go
+*.pb.go
+*.pb.gw.go
+*_pb2.py
+*_pb2_grpc.py
+*.g.dart
+*.freezed.dart
+*.generated.*
+*.min.js
+*.min.css
+go.sum
+Cargo.lock
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
