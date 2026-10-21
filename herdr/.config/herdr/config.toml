@@ -64,29 +64,29 @@ close_tab = "prefix+&"
 accent = "#f5c2e7"
 
 # Smart seamless nav, ported from tmux-navigate (see comment in [keys]).
-# The nav-* actions are vim-aware: forward to nvim when it's focused, else
+# herdr-splits-nav.sh runs the plugin nav on the viewed machine: forward to nvim when focused, else
 # move herdr pane focus. Resize actions exist too (alt+h/j/k/l) but are left
 # unbound — nvim uses winresizer, herdr uses prefix+r.
 agent_panel_sort = "spaces"
 [[keys.command]]
 key = "ctrl+h"
-type = "plugin_action"
-command = "herdr-splits.nav-left"
+type = "shell"
+command = 'bash "$HOME/.config/herdr/herdr-splits-nav.sh" left'
 
 [[keys.command]]
 key = "ctrl+j"
-type = "plugin_action"
-command = "herdr-splits.nav-down"
+type = "shell"
+command = 'bash "$HOME/.config/herdr/herdr-splits-nav.sh" down'
 
 [[keys.command]]
 key = "ctrl+k"
-type = "plugin_action"
-command = "herdr-splits.nav-up"
+type = "shell"
+command = 'bash "$HOME/.config/herdr/herdr-splits-nav.sh" up'
 
 [[keys.command]]
 key = "ctrl+l"
-type = "plugin_action"
-command = "herdr-splits.nav-right"
+type = "shell"
+command = 'bash "$HOME/.config/herdr/herdr-splits-nav.sh" right'
 
 # ponytail: the following tmux features have NO herdr equivalent — left out on purpose:
 #   - status bar modules (cpu / memory / primary-ip / battery / date / coder
